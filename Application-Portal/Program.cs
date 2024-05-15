@@ -1,6 +1,8 @@
 using Application_Portal.Data;
 using Application_Portal.Services;
 using Microsoft.Azure.Cosmos;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,13 @@ string containerName = "CandidatApplicationDB";
 CosmosClient cosmosClient = new CosmosClient(connectionString);
 Database database = await cosmosClient.CreateDatabaseIfNotExistsAsync(databaseName);
 Container container = await database.CreateContainerIfNotExistsAsync(containerName, "/id");
+
+builder.Services.AddDbContext<DataContext>(options =>
+        options.UseCosmos(
+            "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==t",
+            "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
+            databaseName: "MyDB"
+        ));
 
 // Register repository and container
 builder.Services.AddSingleton<Container>(container);
